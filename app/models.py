@@ -25,6 +25,12 @@ class User(AbstractUser):
 
 
 class Post(models.Model):
+    STATUS_CHOICES = (
+        ('Picked', 'Picked'),
+        ('On Progress', 'On Progress'),
+        ('Delivered', 'Delivered'),
+    )
+    status = models.CharField(choices=STATUS_CHOICES, max_length=100, null=True)
     description = models.CharField(max_length=500)
     preffered_location = models.CharField(max_length=150)
     delivery_location = models.CharField(max_length=150)
