@@ -29,16 +29,15 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
 
 class POstSerializer(serializers.HyperlinkedModelSerializer):
-    owner = serializers.ReadonlyField(source='owner.username')
+    owner = serializers.ReadOnlyField(source='owner.username')
 
     class Meta:
         model = Post
-        fields = ('description', 'preffered_location', 'delivery_location')
+        fields = ('description', 'preffered_location', 'owner', 'delivery_location')
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     posts = serializers.HyperlinkedRelatedField(many=True, view_name='post-detail', read_only=True)
-
     class Meta:
         model = User
-        fields = ('url', 'id', 'username', 'posts')
+        fields = ('url', 'id', 'username', 'user_type', 'posts')

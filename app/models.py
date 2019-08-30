@@ -8,7 +8,7 @@ class User(AbstractUser):
         ('Agent', 'Agent'),
         ('User', 'User'),
     )
-    user_type = models.CharField(choices=USER_TYPE_CHOICES, max_length=100, default='Agent')
+    user_type = models.CharField(choices=USER_TYPE_CHOICES, max_length=100, default='User')
     first_name = models.CharField(max_length=20, null=True, blank=True)
     last_name = models.CharField(max_length=20, null=True, blank=True)
     username = models.CharField(max_length=50, unique=True)
@@ -28,6 +28,7 @@ class Post(models.Model):
     description = models.CharField(max_length=500)
     preffered_location = models.CharField(max_length=150)
     delivery_location = models.CharField(max_length=150)
+    owner = models.ForeignKey(User, related_name='posts', on_delete=models.CASCADE)
 
     def __str__(self):
         return  self.delivery_location
