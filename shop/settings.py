@@ -126,9 +126,16 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
 AUTH_USER_MODEL = 'app.User'
+
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'asminrai7@gmail.com'
+EMAIL_HOST_PASSWORD = 'R0cket1234#'
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False

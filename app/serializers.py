@@ -16,6 +16,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
             user = User(
                 user_type=self.validated_data['user_type'],
                 username=self.validated_data['username'],
+                email=self.validated_data['email'],
                 address=self.validated_data['address'],
                 phone_number=self.validated_data['phone_number']
             )
@@ -30,14 +31,14 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
 class POstSerializer(serializers.HyperlinkedModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.username')
-
+    status = Post.status
     class Meta:
         model = Post
-        fields = ('url', 'id', 'description', 'preffered_location', 'owner', 'delivery_location')
+        fields = ('url', 'id', 'status', 'description', 'preffered_location', 'owner', 'delivery_location')
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     posts = serializers.HyperlinkedRelatedField(many=True, view_name='post-detail', read_only=True)
     class Meta:
         model = User
-        fields = ('url', 'id', 'username', 'user_type', 'phone_number', 'posts')
+        fields = ('url', 'id', 'username', 'email', 'user_type', 'phone_number', 'posts')

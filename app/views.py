@@ -1,4 +1,7 @@
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
+from django.core.mail import send_mail, BadHeaderError, EmailMessage
+
 from rest_framework import generics, permissions, mixins
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -7,8 +10,9 @@ from rest_framework.reverse import reverse
 
 # from app.permissions import IsAllowedToWrite
 from app.permissions import IsAllowedToRead, IsOwnerOrReadonly
-from .models import User,Post
+from .models import User, Post
 from .serializers import POstSerializer, UserSerializer, RegistrationSerializer
+
 
 @api_view(['GET', 'POST'])
 def registration_view(request):
@@ -18,7 +22,7 @@ def registration_view(request):
         return Response(serializer.data)
 
     if request.method == 'POST':
-        serializer = RegistrationSerializer(data = request.data)
+        serializer = RegistrationSerializer(data=request.data)
         if serializer.is_valid():
             password = serializer.validated_data['password']
             password2 = serializer.validated_data['password2']
@@ -39,6 +43,7 @@ def registration_view(request):
                 user = User(
                     user_type=user_type,
                     username=serializer.validated_data['username'],
+                    email=serializer.validated_data['email'],
                     address=address,
                     phone_number=phone_number
 
@@ -63,7 +68,6 @@ def api_root(request):
     })
 
 
-
 class PostList(generics.ListCreateAPIView):
     queryset = Post.objects.all()
     serializer_class = POstSerializer
@@ -75,8 +79,42 @@ class PostList(generics.ListCreateAPIView):
 
 class PostDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Post.objects.all()
+    user = User.objects.all()
     serializer_class = POstSerializer
     permission_classes = (permissions.IsAuthenticated, IsOwnerOrReadonly,)
+
+    def send_email(self, request):
+        # if POstSerializer.status is not 'null':
+            # email = EmailMessage(
+            #     'status', POstSerializer.status, 'asminrai7@gmail.com', to=[self.user.email], fail_silently=False
+            # )
+            # email.send()
+
+        send_mail("Status",
+                  "I am trying to show status",
+                  "asminrai7@gmail.com",
+                  ["asminrai7@gmail.com"],
+                  fail_silently=False)
+        return render(request, 'app/index.html')
+
+    def update(self, request, *args, **kwargs):
+        response = super(PostDetail, self).update(request, *args, **kwargs)
+        self.send_email(request)
+        return response
+
+
+# def send_email(request):
+#     subject = request.POST.get('subject', 'Status')
+#     message = request.POST.get('message', 'this is message')
+#     from_email = request.POST.get('from_email', 'from@example.com')
+#     if subject and message and from_email:
+#         try:
+#             send_mail(subject, message, from_email, ['asminrai7@gmail.com'])
+#         except BadHeaderError:
+#             return HttpResponse('Invalid header found.')
+#         return HttpResponseRedirect('/posts/')
+#     else:
+#         return HttpResponse('Make sure all fields are entered and valid.')
 
 
 # class PostList(mixins.ListModelMixin, generics.GenericAPIView):

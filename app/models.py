@@ -27,7 +27,7 @@ class User(AbstractUser):
 class Post(models.Model):
     STATUS_CHOICES = (
         ('Picked', 'Picked'),
-        ('On Progress', 'On Progress'),
+        ('Drop', 'On Progress'),
         ('Delivered', 'Delivered'),
     )
     status = models.CharField(choices=STATUS_CHOICES, max_length=100, null=True)
@@ -37,7 +37,7 @@ class Post(models.Model):
     owner = models.ForeignKey(User, related_name='posts', on_delete=models.CASCADE)
 
     def __str__(self):
-        return  self.delivery_location
+        return self.delivery_location
 
 
 
