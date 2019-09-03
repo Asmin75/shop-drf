@@ -37,7 +37,7 @@ class Post(models.Model):
     owner = models.ForeignKey(User, related_name='posts', on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.delivery_location
+        return self.delivery_location, self.status
 
 
 

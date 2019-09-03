@@ -12,6 +12,7 @@ urlpatterns = [
     path('users/', views.UserList.as_view(), name='user-list'),
     path('users/<int:pk>/', views.UserDetail.as_view(), name='user-detail'),
     path('register/', views.registration_view, name='register'),
+    # path('index/', views.index),
     path('', views.api_root),
 ]
 
