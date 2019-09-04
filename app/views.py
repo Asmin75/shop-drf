@@ -90,12 +90,14 @@ class PostDetail(generics.RetrieveUpdateDestroyAPIView):
             # )
             # email.send()
 
-        p = Post.objects.filter(pk=pk)
-        user = str(p.values("owner__username"))
-        status = str(p.values("status"))
+        post = Post.objects.get(pk=pk)
+        # user = str(p.values("owner__username"))
+        # status = str(p.values("status"))
+        status = post.status
+        user = post.owner.username
         send_mail("Status",
-                  "Dear"+user+","+
-                              "It has been"+status,
+                  "Dear" +user+ "," +
+                              " It has been"+ status,
                   "asminrai7@gmail.com",
                   ["asminrai7@gmail.com"],
                   fail_silently=False)
