@@ -1,4 +1,6 @@
 from rest_framework import serializers
+# from rest_auth.serializers import PasswordResetSerializer
+
 from .models import User,Post
 
 
@@ -29,6 +31,23 @@ class RegistrationSerializer(serializers.ModelSerializer):
             user.save()
 
 
+# class UserPasswordResetSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = User
+#         fields = ['password']
+#         extra_kwargs = {
+#             'password': {'write_only': True}
+#         }
+#
+#     def update(self, instance, validated_data):
+#         for attr, value in validated_data.items():
+#             if attr == 'password':
+#                 instance.set_password(value)
+#             else:
+#                 setattr(instance, attr, value)
+#             instance.save()
+#             return instance
+
 class POstSerializer(serializers.HyperlinkedModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.username')
     status = Post.status
@@ -42,3 +61,6 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
         fields = ('url', 'id', 'username', 'email', 'user_type', 'phone_number', 'posts')
+
+
+# class CustomPasswordResetSerializer()

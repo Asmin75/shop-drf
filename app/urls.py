@@ -1,4 +1,5 @@
 from django.urls import path
+from django.contrib.auth import views as auth_views
 from rest_framework.urlpatterns import format_suffix_patterns
 from app import views
 
@@ -12,6 +13,9 @@ urlpatterns = [
     path('users/', views.UserList.as_view(), name='user-list'),
     path('users/<int:pk>/', views.UserDetail.as_view(), name='user-detail'),
     path('register/', views.registration_view, name='register'),
+    # path('password_reset/', views.PasswordResetView,
+    #      name='password_reset'),
+
     # path('index/', views.index),
     path('', views.api_root),
 ]

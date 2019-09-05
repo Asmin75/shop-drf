@@ -83,23 +83,15 @@ class PostDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = POstSerializer
     permission_classes = (permissions.IsAuthenticated, IsOwnerOrReadonly,)
 
-    def send_email(self, request,pk):
-        # if POstSerializer.status is not 'null':
-            # email = EmailMessage(
-            #     'status', POstSerializer.status, 'asminrai7@gmail.com', to=[self.user.email], fail_silently=False
-            # )
-            # email.send()
-
+    def send_email(self, request, pk):
         post = Post.objects.get(pk=pk)
-        # user = str(p.values("owner__username"))
-        # status = str(p.values("status"))
         status = post.status
         user = post.owner.username
         send_mail("Status",
-                  "Dear" +user+ "," +
-                              " It has been"+ status,
-                  "asminrai7@gmail.com",
-                  ["asminrai7@gmail.com"],
+                  "Dear " +user+ "," +
+                              " It has been "+ status,
+                  "from@example.com",
+                  [post.owner.email],
                   fail_silently=False)
         return render(request, 'app/index.html')
 
