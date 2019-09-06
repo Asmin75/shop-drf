@@ -1,17 +1,21 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.core.mail import send_mail, BadHeaderError, EmailMessage
+from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework import generics, permissions, mixins
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
+from rest_framework.authtoken.models import Token
+from rest_framework import status
+
 
 # from app.permissions import IsAllowedToWrite
 from app.permissions import IsAllowedToRead, IsOwnerOrReadonly
 from .models import User, Post
-from .serializers import POstSerializer, UserSerializer, RegistrationSerializer
+from .serializers import POstSerializer, UserSerializer, RegistrationSerializer, UserPasswordResetSerializer,CustomPasswordResetSerializer
 
 
 @api_view(['GET', 'POST'])
@@ -100,6 +104,34 @@ class PostDetail(generics.RetrieveUpdateDestroyAPIView):
         self.send_email(request, pk)
         return response
 
+
+@csrf_exempt
+@api_view(['POST'])
+def passwordreset_view(request):
+    if request.method == 'POST':
+        user = User.objects.all()
+        serializer = CustomPasswordResetSerializer(data=request.data)
+        if serializer.is_valid():
+            email = serializer.validated_data['email']
+            print(email)
+            if email != '':
+                email_list = User.objects.filter(email=email)
+                if not email_list:
+                    return Response(data={'message': "Couldn't found matching email!"})
+                else:
+                    token=Token.objects.get_or_create(user=user)
+                    return Response(data={'token':token.key})
+            else:
+                return Response(data={'message': 'Empty email provided'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# @csrf_exempt
+# @api_view['POST']
+# def passwordresetconfirm_view(request):
+#     if request.method == 'POST':
+#         user = User.objects.all()
+#         serializer = UserPasswordResetSerializer
 
 # def send_email(request):
 #     subject = request.POST.get('subject', 'Status')
