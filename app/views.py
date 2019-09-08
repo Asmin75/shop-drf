@@ -11,11 +11,14 @@ from rest_framework.reverse import reverse
 from rest_framework.authtoken.models import Token
 from rest_framework import status
 
+from app.tokens import TokenGenerator
+from django.template.loader import render_to_string
 
 # from app.permissions import IsAllowedToWrite
 from app.permissions import IsAllowedToRead, IsOwnerOrReadonly
 from .models import User, Post
-from .serializers import POstSerializer, UserSerializer, RegistrationSerializer, UserPasswordResetSerializer,CustomPasswordResetSerializer
+from .serializers import POstSerializer, UserSerializer, RegistrationSerializer, UserPasswordResetSerializer, \
+    CustomPasswordResetSerializer, CustomPasswordResetDoneSerializer
 
 
 @api_view(['GET', 'POST'])
@@ -109,29 +112,58 @@ class PostDetail(generics.RetrieveUpdateDestroyAPIView):
 @api_view(['POST'])
 def passwordreset_view(request):
     if request.method == 'POST':
-        user = User.objects.all()
+        # user = User.objects.all()
         serializer = CustomPasswordResetSerializer(data=request.data)
         if serializer.is_valid():
             email = serializer.validated_data['email']
-            print(email)
+            # print(email)
             if email != '':
-                email_list = User.objects.filter(email=email)
-                if not email_list:
+                email = User.objects.get(email=email)
+                if not email:
                     return Response(data={'message': "Couldn't found matching email!"})
                 else:
-                    token=Token.objects.get_or_create(user=user)
-                    return Response(data={'token':token.key})
+                    # token, created = Token.objects.get_or_create(user=user)email
+                    return Response(send_email(email))
             else:
                 return Response(data={'message': 'Empty email provided'}, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# @csrf_exempt
-# @api_view['POST']
-# def passwordresetconfirm_view(request):
-#     if request.method == 'POST':
-#         user = User.objects.all()
-#         serializer = UserPasswordResetSerializer
+def send_email(user):
+    message = render_to_string('app/password_reset_email.html', {
+        'protocol': 'http',
+        'domain': 'localhost:8000',
+        'uid': str(user.pk),
+        'token': str(TokenGenerator().make_token(user)),
+    })
+    mail_subject = 'Password Reset.'
+    to_email = user.email
+    email = EmailMessage(mail_subject, message, to=[to_email])
+    send = email.send()
+    # user.set_password(validated_data.get('password'))
+    # user.save()
+    return send
+
+@csrf_exempt
+@api_view(['POST'])
+def passwordresetdone_view(request):
+    if request.method == 'POST':
+        user = User.objects.all()
+        serializer = CustomPasswordResetDoneSerializer
+        if serializer.is_valid():
+            password = serializer.validated_data['password']
+            password2 = serializer.validated_data['password2']
+            if password == password2:
+                user.set_password(password)
+                user.save()
+            else:
+                return Response("Confirm your password and try again")
+        else:
+            return Response(serializer.errors)
+
+        return Response(serializer.data)
+
+
 
 # def send_email(request):
 #     subject = request.POST.get('subject', 'Status')

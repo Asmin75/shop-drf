@@ -14,7 +14,7 @@ urlpatterns = [
     path('users/<int:pk>/', views.UserDetail.as_view(), name='user-detail'),
     path('register/', views.registration_view, name='register'),
     path('password_reset/', views.passwordreset_view, name='password_reset'),
-    # path('password_reset_confirm/', views.passwordresetconfirm_view, name='password_reset_confirm')
+    path('password_reset_done/', views.passwordresetdone_view, name='password_reset_done'),
 
     # path('index/', views.index),
     path('', views.api_root),
