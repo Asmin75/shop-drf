@@ -123,39 +123,40 @@ def passwordreset_view(request):
                     return Response(data={'message': "Couldn't found matching email!"})
                 else:
                     # token, created = Token.objects.get_or_create(user=user)email
+                    # return Response(TokenGenerator().make_token(email))
                     return Response(send_email(email))
             else:
                 return Response(data={'message': 'Empty email provided'}, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 def send_email(user):
     message = render_to_string('app/password_reset_email.html', {
         'protocol': 'http',
         'domain': 'localhost:8000',
         'uid': str(user.pk),
-        'token': str(TokenGenerator().make_token(user)),
+        'token': TokenGenerator().make_token(user),
     })
     mail_subject = 'Password Reset.'
     to_email = user.email
     email = EmailMessage(mail_subject, message, to=[to_email])
     send = email.send()
-    # user.set_password(validated_data.get('password'))
-    # user.save()
     return send
 
 @csrf_exempt
 @api_view(['POST'])
-def passwordresetdone_view(request):
+def passwordresetdone_view(request, uid):
     if request.method == 'POST':
-        user = User.objects.all()
-        serializer = CustomPasswordResetDoneSerializer
-        if serializer.is_valid():
+        user = User.objects.get(pk=uid)
+        serializer = CustomPasswordResetDoneSerializer(data=request.POST)
+        if serializer.is_valid(request.POST):
             password = serializer.validated_data['password']
             password2 = serializer.validated_data['password2']
             if password == password2:
                 user.set_password(password)
                 user.save()
+                return Response("Password reset done!")
             else:
                 return Response("Confirm your password and try again")
         else:

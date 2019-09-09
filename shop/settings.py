@@ -143,7 +143,7 @@ AUTH_USER_MODEL = 'app.User'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'asminrai7@gmail.com'
-EMAIL_HOST_PASSWORD = 'R0cket1234#'
+EMAIL_HOST_PASSWORD = 'Galaxye7@'
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 

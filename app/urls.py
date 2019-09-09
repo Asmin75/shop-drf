@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 from django.contrib.auth import views as auth_views
 from rest_framework.urlpatterns import format_suffix_patterns
 from app import views
@@ -14,7 +14,7 @@ urlpatterns = [
     path('users/<int:pk>/', views.UserDetail.as_view(), name='user-detail'),
     path('register/', views.registration_view, name='register'),
     path('password_reset/', views.passwordreset_view, name='password_reset'),
-    path('password_reset_done/', views.passwordresetdone_view, name='password_reset_done'),
+    re_path('test/(?P<uid>[0-9A-Za-z]+)/$', views.passwordresetdone_view, name='password_reset_done'),
 
     # path('index/', views.index),
     path('', views.api_root),
