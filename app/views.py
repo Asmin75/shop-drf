@@ -1,3 +1,4 @@
+from django.contrib.auth import authenticate
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.core.mail import send_mail, BadHeaderError, EmailMessage
@@ -10,6 +11,12 @@ from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.authtoken.models import Token
 from rest_framework import status
+from rest_framework.permissions import AllowAny
+from rest_framework.status import (
+    HTTP_400_BAD_REQUEST,
+    HTTP_404_NOT_FOUND,
+    HTTP_200_OK
+)
 
 from app.tokens import TokenGenerator
 from django.template.loader import render_to_string
@@ -63,6 +70,24 @@ def registration_view(request):
             return Response(serializer.errors)
 
         return Response(serializer.data)
+
+
+@csrf_exempt
+@api_view(["POST"])
+@permission_classes((AllowAny,))
+def login(request):
+    username = request.data.get("username")
+    password = request.data.get("password")
+    if username is None or password is None:
+        return Response({'error': 'Please provide both username and password'},
+                        status=HTTP_400_BAD_REQUEST)
+    user = authenticate(username=username, password=password)
+    if not user:
+        return Response({'error': 'Invalid Credentials'},
+                        status=HTTP_404_NOT_FOUND)
+    token, _ = Token.objects.get_or_create(user=user)
+    return Response({'token': token.key},
+                    status=HTTP_200_OK)
 
 
 @api_view(['GET'])
@@ -146,9 +171,9 @@ def send_email(user):
 
 @csrf_exempt
 @api_view(['POST'])
-def passwordresetdone_view(request, uid):
+def passwordresetdone_view(request, uid, token):
     if request.method == 'POST':
-        user = User.objects.get(pk=uid)
+        user = User.objects.get(pk=uid, auth_token=token)
         serializer = CustomPasswordResetDoneSerializer(data=request.POST)
         if serializer.is_valid(request.POST):
             password = serializer.validated_data['password']
@@ -162,7 +187,7 @@ def passwordresetdone_view(request, uid):
         else:
             return Response(serializer.errors)
 
-        return Response(serializer.data)
+
 
 
 

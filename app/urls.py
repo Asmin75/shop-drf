@@ -6,6 +6,8 @@ from app import views
 # from tutorial.snippets.views import registration_view
 
 urlpatterns = [
+    path('api/login/', views.login),
+    # path('api/sampleapi', views.sample_api),
     path('posts/', views.PostList.as_view(), name='post-list'),
     # path('post-create/', views.PostCreate.as_view(), name='post-create'),
     path('post/<int:pk>/', views.PostDetail.as_view(), name='post-detail'),
@@ -14,7 +16,7 @@ urlpatterns = [
     path('users/<int:pk>/', views.UserDetail.as_view(), name='user-detail'),
     path('register/', views.registration_view, name='register'),
     path('password_reset/', views.passwordreset_view, name='password_reset'),
-    re_path('test/(?P<uid>[0-9A-Za-z]+)/$', views.passwordresetdone_view, name='password_reset_done'),
+    re_path('password_reset_done/(?P<uid>[0-9A-Za-z]+)/(?P<token>[0-9A-Za-z]{1,40})/$', views.passwordresetdone_view, name='password_reset_done'),
 
     # path('index/', views.index),
     path('', views.api_root),
