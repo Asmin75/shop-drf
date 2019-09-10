@@ -53,6 +53,7 @@ class UserPasswordResetSerializer(serializers.ModelSerializer):
             instance.save()
             return instance
 
+
 class POstSerializer(serializers.HyperlinkedModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.username')
     status = Post.status
@@ -71,24 +72,13 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 class CustomPasswordResetSerializer(serializers.Serializer):
     email = serializers.EmailField()
 
-    # def create(self):
-    #     self.is_valid()
-    #     user = User.objects.get(email=self.validated_data['email'])
-    #     message = render_to_string('app/password_reset_email.html', {
-    #         'protocal': 'http',
-    #         'domain': 'localhost:8000',
-    #         'uid': str(user.pk),
-    #         'token': str(TokenGenerator().make_token(user)),
-    #     })
-    #     mail_subject = 'Password Reset.'
-    #     to_email = user.email
-    #     email = EmailMessage(mail_subject, message, to=[to_email])
-    #     send = email.send()
-    #     # user.set_password(validated_data.get('password'))
-    #     # user.save()
-    #     return send
-
 
 class CustomPasswordResetDoneSerializer(serializers.Serializer):
     password = serializers.CharField()
     password2 = serializers.CharField()
+
+
+class CustomPasswordChangeSerializer(serializers.Serializer):
+    current_password = serializers.CharField()
+    new_password = serializers.CharField()
+    new_password1 = serializers.CharField()

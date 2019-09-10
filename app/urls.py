@@ -17,6 +17,8 @@ urlpatterns = [
     path('register/', views.registration_view, name='register'),
     path('password_reset/', views.passwordreset_view, name='password_reset'),
     re_path('password_reset_done/(?P<uid>[0-9A-Za-z]+)/(?P<token>[0-9A-Za-z]{1,40})/$', views.passwordresetdone_view, name='password_reset_done'),
+    path('password_change/', views.passwordchangedone_view, name='password_change'),
+    # re_path('password_change_done/(?P<uid>[0-9A-Za-z]+)/(?P<token>[0-9A-Za-z]{1,40})/$', views.passwordchangedone_view, name='password_change_done'),
 
     # path('index/', views.index),
     path('', views.api_root),

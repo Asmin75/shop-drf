@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate
+from django.contrib.auth.hashers import check_password
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.core.mail import send_mail, BadHeaderError, EmailMessage
@@ -25,7 +26,7 @@ from django.template.loader import render_to_string
 from app.permissions import IsAllowedToRead, IsOwnerOrReadonly
 from .models import User, Post
 from .serializers import POstSerializer, UserSerializer, RegistrationSerializer, UserPasswordResetSerializer, \
-    CustomPasswordResetSerializer, CustomPasswordResetDoneSerializer
+    CustomPasswordResetSerializer, CustomPasswordResetDoneSerializer, CustomPasswordChangeSerializer
 
 
 @api_view(['GET', 'POST'])
@@ -188,7 +189,29 @@ def passwordresetdone_view(request, uid, token):
             return Response(serializer.errors)
 
 
-
+@csrf_exempt
+@api_view(['POST'])
+def passwordchangedone_view(request):
+    if request.method == 'POST':
+        # user = User.objects.get(pk=pk)
+        # return Response({'password':user.password})
+        serializer = CustomPasswordChangeSerializer(data=request.POST)
+        if serializer.is_valid(request.POST):
+            current_password = serializer.validated_data['current_password']
+            # return Response(str(request.user.password))
+            new_password = serializer.validated_data['new_password']
+            new_password1 = serializer.validated_data['new_password1']
+            if check_password(current_password, request.user.password):
+                if new_password == new_password1:
+                    request.user.set_password(new_password)
+                    request.user.save()
+                    return Response("Successfully your Password is change!")
+                else:
+                    return Response("New password din't match!")
+            else:
+                return Response("Current password doesn't match with your password!")
+        else:
+            return Response(serializer.errors)
 
 
 # def send_email(request):
