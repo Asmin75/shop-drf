@@ -8,6 +8,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework import generics, permissions, mixins
+from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -191,15 +192,38 @@ def passwordresetdone_view(request, uid, token):
             return Response(serializer.errors)
 
 
-@permission_classes(IsAuthenticated)
-@csrf_exempt
-@api_view(['POST'])
-def passwordchangedone_view(request):
-    if request.method == 'POST':
-        # user = User.objects.get(pk=pk)
-        # return Response({'password':user.password})
+# @permission_classes(IsAuthenticated)
+# @csrf_exempt
+# @api_view(['POST'])
+# def passwordchangedone_view(request):
+#     if request.method == 'POST':
+#         # user = User.objects.get(pk=pk)
+#         # return Response({'password':user.password})
+#         serializer = CustomPasswordChangeSerializer(data=request.POST)
+#         if serializer.is_valid(request.POST):
+#             current_password = serializer.validated_data['current_password']
+#             # return Response(str(request.user.password))
+#             new_password = serializer.validated_data['new_password']
+#             new_password1 = serializer.validated_data['new_password1']
+#             if check_password(current_password, request.user.password):
+#                 if new_password == new_password1:
+#                     request.user.set_password(new_password)
+#                     request.user.save()
+#                     return Response("Successfully your Password is change!")
+#                 else:
+#                     return Response("New password din't match!")
+#             else:
+#                 return Response("Current password doesn't match with your password!")
+#         else:
+#             return Response(serializer.errors)
+
+
+class PermissionChangeDone(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
         serializer = CustomPasswordChangeSerializer(data=request.POST)
-        if serializer.is_valid(request.POST):
+        if serializer.is_valid():
             current_password = serializer.validated_data['current_password']
             # return Response(str(request.user.password))
             new_password = serializer.validated_data['new_password']
@@ -215,7 +239,6 @@ def passwordchangedone_view(request):
                 return Response("Current password doesn't match with your password!")
         else:
             return Response(serializer.errors)
-
 
 # def send_email(request):
 #     subject = request.POST.get('subject', 'Status')
