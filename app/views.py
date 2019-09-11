@@ -1,8 +1,10 @@
 from django.contrib.auth import authenticate
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import check_password
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.core.mail import send_mail, BadHeaderError, EmailMessage
+from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework import generics, permissions, mixins
@@ -189,6 +191,7 @@ def passwordresetdone_view(request, uid, token):
             return Response(serializer.errors)
 
 
+@permission_classes(IsAuthenticated)
 @csrf_exempt
 @api_view(['POST'])
 def passwordchangedone_view(request):
