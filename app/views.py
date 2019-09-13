@@ -296,10 +296,14 @@ class UserList(generics.ListAPIView):
     permission_classes = (permissions.IsAuthenticated, IsAllowedToRead,)
 
 
-class UserDetail(generics.RetrieveAPIView):
+class UserDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.IsAuthenticated,IsOwnerOrReadonly)
+
+    def update(self, request, *args, **kwargs):
+        response = super(UserDetail, self).update(request, *args, **kwargs)
+        return response
 
 
 
