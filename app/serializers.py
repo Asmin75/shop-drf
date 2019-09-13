@@ -4,13 +4,15 @@ from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
 
 from app.tokens import TokenGenerator
-from .models import User,Post
+from .models import User, Post
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(style={'input_type': 'password'}, write_only=True)
+    email = serializers.EmailField(validators=[UniqueValidator(queryset=User.objects.all())])
 
     class Meta:
         model = User
@@ -57,6 +59,7 @@ class UserPasswordResetSerializer(serializers.ModelSerializer):
 class POstSerializer(serializers.HyperlinkedModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.username')
     status = Post.status
+
     class Meta:
         model = Post
         fields = ('url', 'id', 'status', 'description', 'preffered_location', 'owner', 'delivery_location')
@@ -64,6 +67,7 @@ class POstSerializer(serializers.HyperlinkedModelSerializer):
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     posts = serializers.HyperlinkedRelatedField(many=True, view_name='post-detail', read_only=True)
+
     class Meta:
         model = User
         fields = ('url', 'id', 'username', 'email', 'user_type', 'phone_number', 'posts')

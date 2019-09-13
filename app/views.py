@@ -31,7 +31,7 @@ from .models import User, Post
 from .serializers import POstSerializer, UserSerializer, RegistrationSerializer, UserPasswordResetSerializer, \
     CustomPasswordResetSerializer, CustomPasswordResetDoneSerializer, CustomPasswordChangeSerializer
 
-
+@permission_classes((AllowAny,))
 @api_view(['GET', 'POST'])
 def registration_view(request):
     if request.method == 'GET':
