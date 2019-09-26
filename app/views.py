@@ -30,6 +30,8 @@ from app.permissions import IsAllowedToRead, IsOwnerOrReadonly
 from .models import User, Post
 from .serializers import POstSerializer, UserSerializer, RegistrationSerializer, UserPasswordResetSerializer, \
     CustomPasswordResetSerializer, CustomPasswordResetDoneSerializer, CustomPasswordChangeSerializer
+import logging
+
 
 @permission_classes((AllowAny,))
 @api_view(['GET', 'POST'])
@@ -86,6 +88,8 @@ def login(request):
         return Response({'error': 'Please provide both username and password'},
                         status=HTTP_400_BAD_REQUEST)
     user = authenticate(username=username, password=password)
+    logger = logging.getLogger(__name__)
+    logger.info("%s logged in" %(user.username))
     if not user:
         return Response({'error': 'Invalid Credentials'},
                         status=HTTP_404_NOT_FOUND)
@@ -132,7 +136,16 @@ class PostDetail(generics.RetrieveUpdateDestroyAPIView):
         return render(request, 'app/index.html')
 
     def update(self, request, pk, *args, **kwargs):
+        # serializer = POstSerializer(context={'request': request})
         response = super(PostDetail, self).update(request, *args, **kwargs)
+        # logger.log_post_edit()
+        # post=Post(status=serializer.validated_data['status'],
+        #           description=serializer.validated_data['description'],
+        #           preffered_location=serializer.validated_data['preffered_location'],
+        #           delivery_location=serializer.validated_data['delivery_location'],
+        #           owner=serializer.validated_data['owner'],
+        #           )
+        # post.save()
         self.send_email(request, pk)
         return response
 
@@ -305,6 +318,13 @@ class UserDetail(generics.RetrieveUpdateDestroyAPIView):
         response = super(UserDetail, self).update(request, *args, **kwargs)
         return response
 
+
+# logger = logging.getLogger("Asmin")
+#
+#
+# def loggingview(request):
+#     logger.info("Test!")
+#     return HttpResponse("Hello logging world.")
 
 
 

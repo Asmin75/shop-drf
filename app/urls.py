@@ -4,6 +4,8 @@ from rest_framework.urlpatterns import format_suffix_patterns
 from app import views
 
 # from tutorial.snippets.views import registration_view
+# from app.views import loggingview
+# from app.views import loggingview
 
 urlpatterns = [
     path('api/login/', views.login),
@@ -22,6 +24,8 @@ urlpatterns = [
 
     # path('index/', views.index),
     path('', views.api_root),
+    # path('logrecord/', loggingview, name="log"),
+
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
